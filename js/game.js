@@ -93,7 +93,7 @@ let item = items[i];
   item.setInteractive();
 
   //create tween - resize
-  item.resizeTween = this.tweens.add({
+  item.correctTween = this.tweens.add({
     targets: item,
     scaleX: 1.5,
     scaleY: 1.5,
@@ -102,6 +102,18 @@ let item = items[i];
     yoyo: true,
     ease: 'quad.easeInOut'
   });
+
+  item.wrongTween = this.tweens.add({
+    targets: item,
+    scaleX: 1.5,
+    scaleY: 1.5,
+    duration: 300,
+    angle:90,
+    paused:true,
+    yoyo: true,
+    ease: 'quad.easeInOut'
+  });
+
 
 // transparency tween
 item.alphaTween = this.tweens.add({
@@ -113,7 +125,18 @@ item.alphaTween = this.tweens.add({
 
 
   item.on('pointerdown', function(pointer) {
-    item.resizeTween.restart();
+    // item.resizeTween.restart();
+let result = this.processAnswer(this.words[i].spanish);
+
+
+//depending on the result, will play one tween or the other
+if(result) {
+  item.correctTween.restart();
+}
+else {
+  item.wrongTween.restart();
+}
+
     console.log('you clicked ' + item.texture.key);
     //show next question
     this.showNextQuestion();
@@ -147,6 +170,10 @@ this.wordText = this.add.text(30,20, {
   fill: '#ffffff',
 });
 
+//corrext / wrong sounds
+this.correctSound = this.sound.add('correct');
+this.wrongSound = this.sound.add('wrong');
+
 
 //show the first question
 this.showNextQuestion();
@@ -157,14 +184,32 @@ this.showNextQuestion();
 gameScene.showNextQuestion = function() {
 
   //select random word
-  let nextWord = Phaser.Math.RND.pick(this.words);
+  this.nextWord = Phaser.Math.RND.pick(this.words);
 
   //play a sound for that word
-nextWord.sound.play();
+  this.nextWord.sound.play();
 
 
   //show the text of the word in spanish
-this.wordText.setText(nextWord.spanish);
+this.wordText.setText(this.nextWord.spanish);
+};
+
+//answer processing
+gameScene.processAnswer = function(userResponse) {
+  if(userResponse == this.nextWord.spanish) {
+    //it's correct
+
+    //play sound
+this.correctSound.play();
+    return true;
+  }
+  else {
+    //it's incorrect
+
+    //play sound
+this.wrongSound.play();
+    return false;
+  }
 };
 
 
