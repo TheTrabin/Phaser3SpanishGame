@@ -15,3 +15,11 @@ bg.setInteractive();
 //   console.log('click');
 //   console.log(pointer);
 // });
+
+Lesson 4 - Tween Animations...
+- easing function  
+    To change over time.
+
+    tween comes from Between
+
+    

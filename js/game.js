@@ -2,7 +2,55 @@
 let gameScene = new Phaser.Scene('Game');
 
 // some parameters for our scene
-gameScene.init = function() {}
+gameScene.init = function() {
+  //word Dtabase
+  this.words = [
+    {
+    key: 'building',
+    setXY: {
+      x:100,
+      y:240
+    },
+    spanish: 'edificio',
+  },
+  {
+    key: 'house',
+    setXY: {
+      x:240,
+      y:280
+    },
+    setScale: {
+      x: 0.8,
+      y: 0.8,
+    },
+    spanish: 'casa',
+  },
+  {
+    key: 'car',
+    setXY: {
+      x:400,
+      y:300
+    },
+    setScale: {
+      x: 0.8,
+      y: 0.8,
+    },
+    spanish: 'automovil',
+  },
+  {
+    key: 'tree',
+    setXY: {
+      x:550,
+      y:250
+    },
+    setScale: {
+      x: 0.8,
+      y: 0.8,
+    },
+    spanish: 'arbol',
+  },
+  ]
+};
 
 // load asset files for our game
 gameScene.preload = function() {
@@ -29,63 +77,96 @@ gameScene.create = function() {
 
 
 //group
-this.items = this.add.group([
-  {
-  key: 'building',
-  setXY: {
-    x:100,
-    y:240
-  }
-},
-{
-  key: 'house',
-  setXY: {
-    x:240,
-    y:280
-  },
-  setScale: {
-    x: 0.8,
-    y: 0.8,
-  }
-},
-{
-  key: 'car',
-  setXY: {
-    x:400,
-    y:300
-  },
-  setScale: {
-    x: 0.8,
-    y: 0.8,
-  }
-},
-{
-  key: 'tree',
-  setXY: {
-    x:550,
-    y:250
-  },
-  setScale: {
-    x: 0.8,
-    y: 0.8,
-  }
-},
-]);
+this.items = this.add.group(this.words);
 let bg = this.add.sprite(0,0, 'background').setOrigin(0,0);
 // items on top
 this.items.setDepth(1);
 
+// getting the group array
+let items = this.items.getChildren();
 
+for(let i = 0; i < items.length; i++) {
 
-Phaser.Actions.Call(this.items.getChildren(), function(item){
+let item = items[i];
+
+  //make item interactive
   item.setInteractive();
 
-  item.on('pointerdown', function(pointer) {
-    console.log('you clicked ' + item.texture.key);
+  //create tween - resize
+  item.resizeTween = this.tweens.add({
+    targets: item,
+    scaleX: 1.5,
+    scaleY: 1.5,
+    duration: 300,
+    paused:true,
+    yoyo: true,
+    ease: 'quad.easeInOut'
   });
+
+// transparency tween
+item.alphaTween = this.tweens.add({
+  targets: item,
+  alpha: 0.7,
+  duration: 200,
+  paused:true,
+});
+
+
+  item.on('pointerdown', function(pointer) {
+    item.resizeTween.restart();
+    console.log('you clicked ' + item.texture.key);
+    //show next question
+    this.showNextQuestion();
+  }, this);
+
+  //listen to the pointerover
+  item.on('pointerover', function(pointer) {
+    item.alphaTween.restart();
+  }, this);
+
+//listen to the pointerover
+item.on('pointerout', function(pointer) {
+
+  //stop the alpha tween
+  item.alphaTween.stop();
+
+  //set no transparency
+  item.alpha = 1;
 }, this);
 
+//create sound for each word
+this.words[i].sound = this.sound.add(
+this.words[i].key + 'Audio'
+);
+
 };
+
+//text object
+this.wordText = this.add.text(30,20, {
+  font: '28px Open Sans',
+  fill: '#ffffff',
+});
+
+
+//show the first question
+this.showNextQuestion();
+
+};
+
+//show new question
+gameScene.showNextQuestion = function() {
+
+  //select random word
+  let nextWord = Phaser.Math.RND.pick(this.words);
+
+  //play a sound for that word
+nextWord.sound.play();
+
+
+  //show the text of the word in spanish
+this.wordText.setText(nextWord.spanish);
+};
+
 
 // our game's configuration
 let config = {
