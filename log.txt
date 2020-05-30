@@ -1,0 +1,25 @@
+
+let soundSample = this.sound.add('correct');
+
+soundSample.play();
+// soundSample.stop();
+// soundSample.pause();
+
+// bg.depth = -1;
+
+
+
+//make bg interactive
+bg.setInteractive();
+// bg.on('pointerdown', function(pointer){
+//   console.log('click');
+//   console.log(pointer);
+// });
+
+Lesson 4 - Tween Animations...
+- easing function  
+    To change over time.
+
+    tween comes from Between
+
+    
